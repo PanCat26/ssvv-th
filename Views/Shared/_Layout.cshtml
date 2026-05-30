@@ -1,29 +1,37 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ssvv_th</title>
+    <title>@ViewData["Title"] - Mini Library Loan Manager</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ssvv_th.styles.css" asp-append-version="true" />
 </head>
 <body>
+    @{
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+        string NavActive(string controller) =>
+            string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+    }
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ssvv_th</a>
+                <a class="navbar-brand" asp-controller="Book" asp-action="Index">Library Loan Manager</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-start">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link @NavActive("Book")" asp-controller="Book" asp-action="Index">Books</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link @NavActive("Member")" asp-controller="Member" asp-action="Index">Members</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @NavActive("Loan")" asp-controller="Loan" asp-action="Index">Loans</a>
                         </li>
                     </ul>
                 </div>
@@ -38,7 +46,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2026 - ssvv_th - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2026 - Mini Library Loan Manager
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

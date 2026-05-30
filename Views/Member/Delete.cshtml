@@ -1,0 +1,23 @@
+@model ssvv_th.Models.Member
+@{
+    ViewData["Title"] = "Delete Member";
+}
+
+<h1 class="h3 mb-3">Delete Member</h1>
+
+<div class="alert alert-warning">Are you sure you want to delete this member?</div>
+
+<dl class="row">
+    <dt class="col-sm-3">Name</dt>
+    <dd class="col-sm-9">@Model.Name</dd>
+    <dt class="col-sm-3">Email</dt>
+    <dd class="col-sm-9">@Model.Email</dd>
+    <dt class="col-sm-3">Phone</dt>
+    <dd class="col-sm-9">@Model.Phone</dd>
+</dl>
+
+<form asp-action="Delete">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a class="btn btn-link" asp-action="Index">Cancel</a>
+</form>
