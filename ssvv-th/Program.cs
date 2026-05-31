@@ -2,13 +2,13 @@ using Microsoft.EntityFrameworkCore;
 using ssvv_th.Data;
 using ssvv_th.Services;
 
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 // MVC
 builder.Services.AddControllersWithViews();
 
 // Database (MySQL via Pomelo)
-string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<LibraryDbContext>(options =>
@@ -19,12 +19,12 @@ builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IMemberService, MemberService>();
 builder.Services.AddScoped<ILoanService, LoanService>();
 
-WebApplication app = builder.Build();
+var app = builder.Build();
 
 // Create the database/schema on startup if it does not exist yet.
-using (IServiceScope scope = app.Services.CreateScope())
+using (var scope = app.Services.CreateScope())
 {
-    LibraryDbContext db = scope.ServiceProvider.GetRequiredService<LibraryDbContext>();
+    var db = scope.ServiceProvider.GetRequiredService<LibraryDbContext>();
     db.Database.EnsureCreated();
 }
 
@@ -48,3 +48,5 @@ app.MapControllerRoute(
     pattern: "{controller=Book}/{action=Index}/{id?}");
 
 app.Run();
+
+public partial class Program { }
