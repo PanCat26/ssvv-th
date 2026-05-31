@@ -53,6 +53,12 @@ namespace ssvv_th.Services
             if (book == null)
                 return false;
 
+            bool hasRelatedLoans = await _context.Loans.AnyAsync(loan => loan.BookId == id);
+            if (hasRelatedLoans)
+            {
+                throw new InvalidOperationException("This book cannot be deleted because it is referenced by one or more loans.");
+            }
+
             _context.Books.Remove(book);
             await _context.SaveChangesAsync();
             return true;

@@ -83,9 +83,17 @@ namespace ssvv_th.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            bool deleted = await _bookService.DeleteAsync(id);
-            if (!deleted)
-                return NotFound();
+            try
+            {
+                bool deleted = await _bookService.DeleteAsync(id);
+                if (!deleted)
+                    return NotFound();
+            }
+            catch (InvalidOperationException exception)
+            {
+                TempData["Error"] = exception.Message;
+                return RedirectToAction(nameof(Index));
+            }
 
             TempData["Success"] = "Book deleted successfully.";
             return RedirectToAction(nameof(Index));

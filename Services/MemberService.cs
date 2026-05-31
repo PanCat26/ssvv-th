@@ -52,6 +52,12 @@ namespace ssvv_th.Services
             if (member == null)
                 return false;
 
+            bool hasRelatedLoans = await _context.Loans.AnyAsync(loan => loan.MemberId == id);
+            if (hasRelatedLoans)
+            {
+                throw new InvalidOperationException("This member cannot be deleted because they are referenced by one or more loans.");
+            }
+
             _context.Members.Remove(member);
             await _context.SaveChangesAsync();
             return true;
