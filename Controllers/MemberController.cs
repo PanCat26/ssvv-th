@@ -16,7 +16,7 @@ namespace ssvv_th.Controllers
         // GET: /Member
         public async Task<IActionResult> Index()
         {
-            var members = await _memberService.GetAllAsync();
+            List<Member> members = await _memberService.GetAllAsync();
             return View(members);
         }
 
@@ -42,7 +42,7 @@ namespace ssvv_th.Controllers
         // GET: /Member/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            var member = await _memberService.GetByIdAsync(id);
+            Member? member = await _memberService.GetByIdAsync(id);
             if (member == null)
                 return NotFound();
 
@@ -60,7 +60,7 @@ namespace ssvv_th.Controllers
             if (!ModelState.IsValid)
                 return View(member);
 
-            var updated = await _memberService.UpdateAsync(member);
+            Member? updated = await _memberService.UpdateAsync(member);
             if (updated == null)
                 return NotFound();
 
@@ -71,7 +71,7 @@ namespace ssvv_th.Controllers
         // GET: /Member/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
-            var member = await _memberService.GetByIdAsync(id);
+            Member? member = await _memberService.GetByIdAsync(id);
             if (member == null)
                 return NotFound();
 
@@ -83,7 +83,7 @@ namespace ssvv_th.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var deleted = await _memberService.DeleteAsync(id);
+            bool deleted = await _memberService.DeleteAsync(id);
             if (!deleted)
                 return NotFound();
 

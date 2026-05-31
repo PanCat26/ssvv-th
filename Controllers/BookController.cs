@@ -16,7 +16,7 @@ namespace ssvv_th.Controllers
         // GET: /Book
         public async Task<IActionResult> Index()
         {
-            var books = await _bookService.GetAllAsync();
+            List<Book> books = await _bookService.GetAllAsync();
             return View(books);
         }
 
@@ -42,7 +42,7 @@ namespace ssvv_th.Controllers
         // GET: /Book/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            var book = await _bookService.GetByIdAsync(id);
+            Book? book = await _bookService.GetByIdAsync(id);
             if (book == null)
                 return NotFound();
 
@@ -60,7 +60,7 @@ namespace ssvv_th.Controllers
             if (!ModelState.IsValid)
                 return View(book);
 
-            var updated = await _bookService.UpdateAsync(book);
+            Book? updated = await _bookService.UpdateAsync(book);
             if (updated == null)
                 return NotFound();
 
@@ -71,7 +71,7 @@ namespace ssvv_th.Controllers
         // GET: /Book/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
-            var book = await _bookService.GetByIdAsync(id);
+            Book? book = await _bookService.GetByIdAsync(id);
             if (book == null)
                 return NotFound();
 
@@ -83,7 +83,7 @@ namespace ssvv_th.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var deleted = await _bookService.DeleteAsync(id);
+            bool deleted = await _bookService.DeleteAsync(id);
             if (!deleted)
                 return NotFound();
 

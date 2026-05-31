@@ -24,7 +24,7 @@ namespace ssvv_th.Controllers
         // GET: /Loan
         public async Task<IActionResult> Index()
         {
-            var loans = await _loanService.GetAllAsync();
+            List<Loan> loans = await _loanService.GetAllAsync();
             return View(loans);
         }
 
@@ -40,15 +40,20 @@ namespace ssvv_th.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Loan loan)
         {
-            ValidateDates(loan);
-
             if (!ModelState.IsValid)
             {
                 await PopulateDropdownsAsync(loan);
                 return View(loan);
             }
 
-            await _loanService.CreateAsync(loan);
+            LoanOperationResult result = await _loanService.CreateAsync(loan);
+            if (!result.Succeeded)
+            {
+                AddServiceErrors(result);
+                await PopulateDropdownsAsync(loan);
+                return View(loan);
+            }
+
             TempData["Success"] = "Loan created successfully.";
             return RedirectToAction(nameof(Index));
         }
@@ -56,7 +61,7 @@ namespace ssvv_th.Controllers
         // GET: /Loan/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            var loan = await _loanService.GetByIdAsync(id);
+            Loan? loan = await _loanService.GetByIdAsync(id);
             if (loan == null)
                 return NotFound();
 
@@ -72,16 +77,21 @@ namespace ssvv_th.Controllers
             if (id != loan.Id)
                 return BadRequest();
 
-            ValidateDates(loan);
-
             if (!ModelState.IsValid)
             {
                 await PopulateDropdownsAsync(loan);
                 return View(loan);
             }
 
-            var updated = await _loanService.UpdateAsync(loan);
-            if (updated == null)
+            LoanOperationResult result = await _loanService.UpdateAsync(loan);
+            if (!result.Succeeded)
+            {
+                AddServiceErrors(result);
+                await PopulateDropdownsAsync(loan);
+                return View(loan);
+            }
+
+            if (result.Loan == null)
                 return NotFound();
 
             TempData["Success"] = "Loan updated successfully.";
@@ -91,7 +101,7 @@ namespace ssvv_th.Controllers
         // GET: /Loan/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
-            var loan = await _loanService.GetByIdAsync(id);
+            Loan? loan = await _loanService.GetByIdAsync(id);
             if (loan == null)
                 return NotFound();
 
@@ -103,7 +113,7 @@ namespace ssvv_th.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var deleted = await _loanService.DeleteAsync(id);
+            bool deleted = await _loanService.DeleteAsync(id);
             if (!deleted)
                 return NotFound();
 
@@ -111,22 +121,28 @@ namespace ssvv_th.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private void ValidateDates(Loan loan)
+        private void AddServiceErrors(LoanOperationResult result)
         {
-            if (loan.DueDate.Date < loan.LoanDate.Date)
-                ModelState.AddModelError(nameof(Loan.DueDate), "Due date cannot be before the loan date.");
-
-            if (loan.ReturnDate.HasValue && loan.ReturnDate.Value.Date < loan.LoanDate.Date)
-                ModelState.AddModelError(nameof(Loan.ReturnDate), "Return date cannot be before the loan date.");
+            foreach (LoanValidationError error in result.Errors)
+            {
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+            }
         }
 
         private async Task PopulateDropdownsAsync(Loan? loan = null)
         {
-            var books = await _bookService.GetAllAsync();
-            var members = await _memberService.GetAllAsync();
+            List<Book> books = await _bookService.GetAllAsync();
+            List<Member> members = await _memberService.GetAllAsync();
+            IEnumerable<object> borrowableBooks = books
+                .Where(b => b.AvailableCopies > 0 || b.Id == loan?.BookId)
+                .Select(b => new
+                {
+                    b.Id,
+                    Display = $"{b.Title} ({b.Author}) - {b.AvailableCopies} available"
+                });
 
             ViewBag.Books = new SelectList(
-                books.Select(b => new { b.Id, Display = $"{b.Title} ({b.Author})" }),
+                borrowableBooks,
                 "Id", "Display", loan?.BookId);
 
             ViewBag.Members = new SelectList(

@@ -34,7 +34,7 @@ namespace ssvv_th.Services
 
         public async Task<Book?> UpdateAsync(Book book)
         {
-            var existing = await _context.Books.FindAsync(book.Id);
+            Book? existing = await _context.Books.FindAsync(book.Id);
             if (existing == null)
                 return null;
 
@@ -49,7 +49,7 @@ namespace ssvv_th.Services
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var book = await _context.Books.FindAsync(id);
+            Book? book = await _context.Books.FindAsync(id);
             if (book == null)
                 return false;
 
