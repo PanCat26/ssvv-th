@@ -3,9 +3,13 @@
 @{
     ViewData["Title"] = "Reports";
 
-    string reportLabel = Model.ReportType == LoanReportType.All
-        ? "All loans"
-        : $"{Model.ReportType} loans";
+    string periodLabel = (Model.FromDate, Model.ToDate) switch
+    {
+        ({ } fromDate, { } toDate) => $"{fromDate:yyyy-MM-dd} to {toDate:yyyy-MM-dd}",
+        ({ } fromDate, null) => $"from {fromDate:yyyy-MM-dd}",
+        (null, { } toDate) => $"until {toDate:yyyy-MM-dd}",
+        _ => "all time"
+    };
 
     string BadgeClass(string status) => status switch
     {
@@ -18,24 +22,34 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
         <h1 class="h3 mb-0">Loan Reports</h1>
-        <div class="text-muted">Showing @reportLabel.ToLowerInvariant()</div>
+        <div class="text-muted">Books loaned during @periodLabel</div>
     </div>
     <a class="btn btn-outline-primary"
        asp-action="ExportCsv"
+       asp-route-fromDate="@(Model.FromDate?.ToString("yyyy-MM-dd"))"
+       asp-route-toDate="@(Model.ToDate?.ToString("yyyy-MM-dd"))"
        asp-route-reportType="@Model.ReportType"
        asp-route-searchTerm="@Model.SearchTerm">Export CSV</a>
 </div>
 
 <form method="get" class="row g-3 align-items-end mb-4">
-    <div class="col-md-4">
+    <div class="col-md-3">
+        <label asp-for="FromDate" class="form-label"></label>
+        <input asp-for="FromDate" class="form-control" />
+    </div>
+    <div class="col-md-3">
+        <label asp-for="ToDate" class="form-label"></label>
+        <input asp-for="ToDate" class="form-control" />
+    </div>
+    <div class="col-md-3">
         <label asp-for="ReportType" class="form-label"></label>
         <select asp-for="ReportType" asp-items="Html.GetEnumSelectList<LoanReportType>()" class="form-select"></select>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-3">
         <label asp-for="SearchTerm" class="form-label"></label>
         <input asp-for="SearchTerm" class="form-control" placeholder="Book, author, member, or email" />
     </div>
-    <div class="col-md-2 d-grid gap-2">
+    <div class="col-md-3 d-grid gap-2">
         <button type="submit" class="btn btn-primary">View Report</button>
         <a class="btn btn-outline-secondary" asp-action="Index">Reset</a>
     </div>
@@ -44,8 +58,14 @@
 <div class="row g-3 mb-4">
     <div class="col-sm-6 col-lg-3">
         <div class="border rounded p-3">
-            <div class="text-muted small">Total</div>
-            <div class="fs-4 fw-semibold">@Model.TotalLoans</div>
+            <div class="text-muted small">Books Loaned</div>
+            <div class="fs-4 fw-semibold">@Model.TotalBooksLoaned</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="border rounded p-3">
+            <div class="text-muted small">Unique Books</div>
+            <div class="fs-4 fw-semibold">@Model.UniqueBooksLoaned</div>
         </div>
     </div>
     <div class="col-sm-6 col-lg-3">
@@ -60,17 +80,11 @@
             <div class="fs-4 fw-semibold">@Model.OverdueLoans</div>
         </div>
     </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="border rounded p-3">
-            <div class="text-muted small">Returned</div>
-            <div class="fs-4 fw-semibold">@Model.ReturnedLoans</div>
-        </div>
-    </div>
 </div>
 
 @if (!Model.Items.Any())
 {
-    <div class="alert alert-info">No loans match this report.</div>
+    <div class="alert alert-info">No books were loaned for this report.</div>
 }
 else
 {

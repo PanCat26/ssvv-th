@@ -14,15 +14,15 @@ namespace ssvv_th.Controllers
             _reportService = reportService;
         }
 
-        public async Task<IActionResult> Index(LoanReportType reportType = LoanReportType.All, string? searchTerm = null)
+        public async Task<IActionResult> Index(DateTime? fromDate = null, DateTime? toDate = null, LoanReportType reportType = LoanReportType.All, string? searchTerm = null)
         {
-            LoanReportViewModel report = await _reportService.GenerateLoanReportAsync(reportType, searchTerm);
+            LoanReportViewModel report = await _reportService.GenerateLoanReportAsync(fromDate, toDate, reportType, searchTerm);
             return View(report);
         }
 
-        public async Task<IActionResult> ExportCsv(LoanReportType reportType = LoanReportType.All, string? searchTerm = null)
+        public async Task<IActionResult> ExportCsv(DateTime? fromDate = null, DateTime? toDate = null, LoanReportType reportType = LoanReportType.All, string? searchTerm = null)
         {
-            LoanReportViewModel report = await _reportService.GenerateLoanReportAsync(reportType, searchTerm);
+            LoanReportViewModel report = await _reportService.GenerateLoanReportAsync(fromDate, toDate, reportType, searchTerm);
             StringBuilder csv = new StringBuilder();
             csv.AppendLine("Loan Id,Book,Author,Member,Email,Loan Date,Due Date,Return Date,Status");
 

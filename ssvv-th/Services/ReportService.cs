@@ -13,11 +13,21 @@ namespace ssvv_th.Services
             _context = context;
         }
 
-        public async Task<LoanReportViewModel> GenerateLoanReportAsync(LoanReportType reportType, string? searchTerm)
+        public async Task<LoanReportViewModel> GenerateLoanReportAsync(DateTime? fromDate, DateTime? toDate, LoanReportType reportType, string? searchTerm)
         {
             IQueryable<Loan> query = _context.Loans
                 .Include(l => l.Book)
                 .Include(l => l.Member);
+
+            if (fromDate.HasValue)
+            {
+                query = query.Where(l => l.LoanDate.Date >= fromDate.Value.Date);
+            }
+
+            if (toDate.HasValue)
+            {
+                query = query.Where(l => l.LoanDate.Date <= toDate.Value.Date);
+            }
 
             DateTime today = DateTime.Today;
             query = reportType switch
@@ -43,6 +53,8 @@ namespace ssvv_th.Services
 
             return new LoanReportViewModel
             {
+                FromDate = fromDate,
+                ToDate = toDate,
                 ReportType = reportType,
                 SearchTerm = searchTerm,
                 Items = loans.Select(l => new LoanReportItem
