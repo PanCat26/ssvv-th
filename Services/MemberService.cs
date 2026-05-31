@@ -34,7 +34,7 @@ namespace ssvv_th.Services
 
         public async Task<Member?> UpdateAsync(Member member)
         {
-            var existing = await _context.Members.FindAsync(member.Id);
+            Member? existing = await _context.Members.FindAsync(member.Id);
             if (existing == null)
                 return null;
 
@@ -48,9 +48,15 @@ namespace ssvv_th.Services
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var member = await _context.Members.FindAsync(id);
+            Member? member = await _context.Members.FindAsync(id);
             if (member == null)
                 return false;
+
+            bool hasRelatedLoans = await _context.Loans.AnyAsync(loan => loan.MemberId == id);
+            if (hasRelatedLoans)
+            {
+                throw new InvalidOperationException("This member cannot be deleted because they are referenced by one or more loans.");
+            }
 
             _context.Members.Remove(member);
             await _context.SaveChangesAsync();

@@ -34,7 +34,7 @@ namespace ssvv_th.Services
 
         public async Task<Book?> UpdateAsync(Book book)
         {
-            var existing = await _context.Books.FindAsync(book.Id);
+            Book? existing = await _context.Books.FindAsync(book.Id);
             if (existing == null)
                 return null;
 
@@ -49,9 +49,15 @@ namespace ssvv_th.Services
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var book = await _context.Books.FindAsync(id);
+            Book? book = await _context.Books.FindAsync(id);
             if (book == null)
                 return false;
+
+            bool hasRelatedLoans = await _context.Loans.AnyAsync(loan => loan.BookId == id);
+            if (hasRelatedLoans)
+            {
+                throw new InvalidOperationException("This book cannot be deleted because it is referenced by one or more loans.");
+            }
 
             _context.Books.Remove(book);
             await _context.SaveChangesAsync();

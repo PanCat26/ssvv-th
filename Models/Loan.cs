@@ -7,11 +7,11 @@ namespace ssvv_th.Models
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Please select a book.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Please select a book.")]
         [Display(Name = "Book")]
         public int BookId { get; set; }
 
-        [Required(ErrorMessage = "Please select a member.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Please select a member.")]
         [Display(Name = "Member")]
         public int MemberId { get; set; }
 
