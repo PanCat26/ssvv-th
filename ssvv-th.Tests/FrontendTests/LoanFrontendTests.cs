@@ -14,7 +14,8 @@ using Xunit;
 
 namespace ssvv_th.Tests.FrontendTests
 {
-    public class LoanFrontendTests : IClassFixture<CustomWebApplicationFactory<Program>>
+    [Collection("GuiWebCollection")]
+    public class LoanFrontendTests
     {
         private readonly CustomWebApplicationFactory<Program> _factory;
         private readonly HttpClient _client;
