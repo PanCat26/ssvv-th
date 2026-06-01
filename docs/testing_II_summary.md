@@ -8,8 +8,8 @@ We applied three distinct verification and validation methodologies: **Inspectio
 
 ## 1. Testing Dashboard & Executive Summary
 
-- **Total Test Cases Executed**: 34 Automated + 6 Manual Exploratory = 40 Cases
-- **Automated Test Success Rate**: **100% (34/34 Passed)**
+- **Total Test Cases Executed**: 36 Automated + 6 Manual Exploratory = 42 Cases
+- **Automated Test Success Rate**: **100% (36/36 Passed)**
 - **Critical Defects Found**: **6 Defects** (3 Critical/High, 2 Medium, 1 Low)
 - **Frameworks Used**: xUnit, Entity Framework Core (In-Memory), `WebApplicationFactory` (ASP.NET Core integration testing), `AngleSharp` (HTML parsing & frontend assertions), **Microsoft Playwright** (Browser GUI automation).
 
@@ -78,7 +78,7 @@ We designed and implemented a comprehensive, automated C# test project (`ssvv-th
 
 ## 3. Automated Test Execution Results
 
-All 34 tests executed and passed successfully in a single unified run on .NET 8.0:
+All 36 tests executed and passed successfully in a single unified run on .NET 8.0:
 
 ```text
 Test run for C:\Users\user\Documents\0_Facultate\SEM6\SSVV\Exam\TakeHomeExam\ssvv-th.Tests\bin\Debug\net8.0\ssvv-th.Tests.dll (.NETCoreApp,Version=v8.0)
@@ -87,7 +87,7 @@ VSTest version 17.12.0 (x64)
 Starting test execution, please wait...
 A total of 1 test files matched the specified pattern.
 
-Passed!  - Failed:     0, Passed:    34, Skipped:     0, Total:    34, Duration: 6 s - ssvv-th.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    36, Skipped:     0, Total:    36, Duration: 6 s - ssvv-th.Tests.dll (net8.0)
 ```
 
 ### Detailed Breakdown of Automated Tests
@@ -125,9 +125,11 @@ Passed!  - Failed:     0, Passed:    34, Skipped:     0, Total:    34, Duration:
 | `LoanFrontendTests` | `LoanEdit_SubmitInvalidDates_RendersValidationErrorInGUI` | GUI / Web Form | **PASSED** |
 | `LoanFrontendTests` | `LoanDeletePage_GET_RendersConfirmationDetails` | GUI / Web Form | **PASSED** |
 | `LoanFrontendTests` | `LoanDelete_SubmitConfirmation_RedirectsToIndexWithSuccessBanner` | GUI / Web Form | **PASSED** |
+| `LoanPlaywrightTests` | `LoanIndex_ViaPlaywrightBrowser_DisplaysData` | GUI / Browser Read | **PASSED** |
 | `LoanPlaywrightTests` | `LoanCreate_ViaPlaywrightBrowser_PerformsButtonClickAndFormSubmission` | GUI / Browser Click | **PASSED** |
 | `LoanPlaywrightTests` | `LoanCreate_InvalidDates_RendersValidationErrorInBrowser` | GUI / Browser Validation | **PASSED** |
 | `LoanPlaywrightTests` | `LoanEdit_ViaPlaywrightBrowser_ReturnsSuccessAlert` | GUI / Browser Edit | **PASSED** |
+| `LoanPlaywrightTests` | `LoanDelete_ViaPlaywrightBrowser_RemovesRow` | GUI / Browser Delete | **PASSED** |
 
 ---
 

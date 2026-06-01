@@ -282,5 +282,76 @@ namespace ssvv_th.Tests.FrontendTests
             var successBanner = await page.Locator(".alert-success").TextContentAsync();
             Assert.Contains("Loan updated successfully.", successBanner);
         }
+
+        [Fact]
+        public async Task LoanIndex_ViaPlaywrightBrowser_DisplaysData()
+        {
+            var serverAddress = _factory.ServerAddress;
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<LibraryDbContext>();
+                db.Loans.RemoveRange(db.Loans);
+                db.Books.RemoveRange(db.Books);
+                db.Members.RemoveRange(db.Members);
+                await db.SaveChangesAsync();
+
+                var book = new Book { Title = "Playwright Read Book", Author = "QA Team", ISBN = "read-123", AvailableCopies = 2 };
+                var member = new Member { Name = "Reader", Email = "read@example.com" };
+                db.Books.Add(book);
+                db.Members.Add(member);
+                await db.SaveChangesAsync();
+
+                db.Loans.Add(new Loan { BookId = book.Id, MemberId = member.Id, LoanDate = DateTime.Today, DueDate = DateTime.Today.AddDays(7) });
+                await db.SaveChangesAsync();
+            }
+
+            using var playwright = await Playwright.CreateAsync();
+            await using var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions { Headless = true });
+            var page = await browser.NewPageAsync();
+
+            await page.GotoAsync($"{serverAddress}/Loan");
+
+            var tableText = await page.Locator("table").TextContentAsync();
+            Assert.Contains("Playwright Read Book", tableText);
+            Assert.Contains("Reader", tableText);
+        }
+
+        [Fact]
+        public async Task LoanDelete_ViaPlaywrightBrowser_RemovesRow()
+        {
+            var serverAddress = _factory.ServerAddress;
+            int loanId;
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<LibraryDbContext>();
+                db.Loans.RemoveRange(db.Loans);
+                db.Books.RemoveRange(db.Books);
+                db.Members.RemoveRange(db.Members);
+                await db.SaveChangesAsync();
+
+                var book = new Book { Title = "Playwright Delete Book", Author = "QA Team", ISBN = "del-123", AvailableCopies = 2 };
+                var member = new Member { Name = "Deleter", Email = "del@example.com" };
+                db.Books.Add(book);
+                db.Members.Add(member);
+                await db.SaveChangesAsync();
+
+                var loan = new Loan { BookId = book.Id, MemberId = member.Id, LoanDate = DateTime.Today, DueDate = DateTime.Today.AddDays(7) };
+                db.Loans.Add(loan);
+                await db.SaveChangesAsync();
+                loanId = loan.Id;
+            }
+
+            using var playwright = await Playwright.CreateAsync();
+            await using var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions { Headless = true });
+            var page = await browser.NewPageAsync();
+
+            await page.GotoAsync($"{serverAddress}/Loan/Delete/{loanId}");
+            await page.ClickAsync("button.btn-danger");
+
+            await page.WaitForURLAsync($"{serverAddress}/Loan");
+            
+            var successBanner = await page.Locator(".alert-success").TextContentAsync();
+            Assert.Contains("Loan deleted successfully.", successBanner);
+        }
     }
 }
